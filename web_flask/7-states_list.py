@@ -1,22 +1,24 @@
 #!/usr/bin/python3
-"""This module starts a flask app on 0.0.0.0:5000"""
-
+"""Initialize a Flask application with state_list, using the Storage"""
+from flask import Flask, render_template
 from models import storage
-from flask import Flask, abort, render_template
+from models.state import State
+
 app = Flask(__name__)
 
 
+@app.route("/states_list", strict_slashes=False)
+def states_list():
+    """Display the list of states"""
+    values = storage.all(State).values()
+    return (render_template('7-states_list.html', states=values))
+
+
 @app.teardown_appcontext
-def tear_down(exception):
+def teardown(self):
+    """to clse the conection"""
     storage.close()
 
 
-@app.route('/states_list', strict_slashes=False)
-def main():
-    """Returns a text"""
-    states = storage.all("State").values()
-    return render_template('7-states_list.html', states=states)
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+if (__name__ == '__main__'):
+    app.run(host="0.0.0.0", port=5000)
