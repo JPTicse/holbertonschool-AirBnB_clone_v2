@@ -1,37 +1,34 @@
 #!/usr/bin/python3
-"""Initialize a Flask application with state_list, using the Storage"""
-from flask import Flask, render_template
+"""This module starts a flask app on 0.0.0.0:5000"""
+
 from models import storage
-from models.state import State
-
-
+from flask import Flask, abort, render_template
 app = Flask(__name__)
-app.url_map.strict_slashes = False
-
-
-@app.route("/states")
-def states():
-    """Displays an HTML page with a list of all States.
-    States are sorted by name.
-    """
-    states = storage.all("State")
-    return render_template("9-states.html", states=states)
-
-
-@app.route("/states/<id>")
-def states_id(id):
-    """Displays an HTML page with info about <id>, if it exists."""
-    for states in storage.all("State").values():
-        if states.id == id:
-            return render_template("9-states.html", states=states)
-    return render_template("9-states.html")
 
 
 @app.teardown_appcontext
-def teardown(exc):
-    """Remove the current SQLAlchemy session."""
+def tear_down(exception):
     storage.close()
 
 
-if (__name__ == '__main__'):
-    app.run(host="0.0.0.0", port=5000)
+@app.route('/states', strict_slashes=False)
+def states():
+    """Renders an HTML page"""
+    states = storage.all("State")
+    return render_template('9-states.html', states=states)
+
+
+@app.route('/states/<_id>', strict_slashes=False)
+def state(_id):
+    """Renders an HTML page"""
+    states = storage.all("State")
+    state = None
+    for st in states.values():
+        if _id == st.id:
+            state = st
+            break
+    return render_template('9-states.html', state=state)
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
