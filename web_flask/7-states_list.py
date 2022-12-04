@@ -14,9 +14,9 @@ def tear_down(exception):
 @app.route('/states_list', strict_slashes=False)
 def main():
     """Returns a text"""
-    states = storage.all("State")
+    states = storage.all("State").values()
     return render_template('7-states_list.html', states=states)
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=5000)
